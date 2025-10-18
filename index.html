@@ -1,0 +1,1380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VocabMaster - 英语单词学习平台</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind 配置 -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#165DFF',
+            secondary: '#36D399',
+            warning: '#FF9F43',
+            danger: '#F87171',
+            dark: '#1E293B',
+            light: '#F8FAFC'
+          },
+          fontFamily: {
+            inter: ['Inter', 'sans-serif'],
+          },
+        },
+      }
+    }
+  </script>
+  
+  <style type="text/tailwindcss">
+    @layer utilities {
+      .content-auto {
+        content-visibility: auto;
+      }
+      .text-shadow {
+        text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      }
+      .card-hover {
+        @apply transition-all duration-300 hover:shadow-lg hover:-translate-y-1;
+      }
+      .btn-primary {
+        @apply bg-primary text-white px-4 py-2 rounded-lg font-medium transition-all duration-300 hover:bg-primary/90 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-primary/50;
+      }
+      .btn-secondary {
+        @apply bg-white text-primary border border-primary px-4 py-2 rounded-lg font-medium transition-all duration-300 hover:bg-primary/5 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-primary/50;
+      }
+      .input-field {
+        @apply w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all duration-300;
+      }
+      .input-correct {
+        @apply border-secondary ring-2 ring-secondary/50 bg-secondary/5;
+      }
+      .input-incorrect {
+        @apply border-danger ring-2 ring-danger/50 bg-danger/5;
+      }
+    }
+  </style>
+</head>
+
+<body class="font-inter bg-gray-50 text-dark antialiased">
+  <!-- 导航栏 -->
+  <header id="navbar" class="fixed w-full top-0 z-50 transition-all duration-300 bg-white/90 backdrop-blur-sm shadow-sm">
+    <div class="container mx-auto px-4 md:px-6">
+      <div class="flex items-center justify-between h-16 md:h-20">
+        <!-- Logo -->
+        <a href="#" class="flex items-center space-x-2">
+          <div class="w-10 h-10 rounded-lg bg-primary flex items-center justify-center">
+            <i class="fa fa-book text-white text-xl"></i>
+          </div>
+          <span class="text-xl font-bold text-primary">VocabMaster</span>
+        </a>
+        
+        <!-- 桌面导航 -->
+        <nav class="hidden md:flex items-center space-x-8">
+          <a href="#home" class="font-medium hover:text-primary transition-colors">首页</a>
+          <a href="#wordlists" class="font-medium hover:text-primary transition-colors">单词表</a>
+          <a href="#mistakes" class="font-medium hover:text-primary transition-colors">错题集</a>
+          <a href="#practice" class="font-medium hover:text-primary transition-colors">练习</a>
+          <a href="#progress" class="font-medium hover:text-primary transition-colors">进度</a>
+        </nav>
+        
+        <!-- 用户区域 -->
+        <div class="flex items-center space-x-4">
+          <button class="btn-primary hidden md:block">
+            <i class="fa fa-user-circle mr-2"></i>登录
+          </button>
+          
+          <!-- 移动端菜单按钮 -->
+          <button id="menu-toggle" class="md:hidden text-dark focus:outline-none">
+            <i class="fa fa-bars text-xl"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 移动端导航菜单 -->
+    <div id="mobile-menu" class="md:hidden hidden bg-white border-t">
+      <div class="container mx-auto px-4 py-3 space-y-3">
+        <a href="#home" class="block py-2 font-medium hover:text-primary transition-colors">首页</a>
+        <a href="#wordlists" class="block py-2 font-medium hover:text-primary transition-colors">单词表</a>
+        <a href="#mistakes" class="block py-2 font-medium hover:text-primary transition-colors">错题集</a>
+        <a href="#practice" class="block py-2 font-medium hover:text-primary transition-colors">练习</a>
+        <a href="#progress" class="block py-2 font-medium hover:text-primary transition-colors">进度</a>
+        <button class="w-full btn-primary">
+          <i class="fa fa-user-circle mr-2"></i>登录
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- 主内容区 -->
+  <main class="pt-16 md:pt-20">
+    <!-- 英雄区域 -->
+    <section id="home" class="bg-gradient-to-br from-primary/5 to-primary/10 py-16 md:py-24">
+      <div class="container mx-auto px-4 md:px-6">
+        <div class="flex flex-col md:flex-row items-center gap-12">
+          <div class="md:w-1/2 space-y-6">
+            <h1 class="text-[clamp(2rem,5vw,3.5rem)] font-bold leading-tight text-shadow">
+              自定义你的<br><span class="text-primary">英语单词学习</span>之旅
+            </h1>
+            <p class="text-lg text-gray-600 max-w-lg">
+              创建专属单词表，通过多样化练习掌握词汇，系统自动收集错题，让复习更高效。
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4 pt-4">
+              <button class="btn-primary text-lg py-3">
+                开始学习 <i class="fa fa-arrow-right ml-2"></i>
+              </button>
+              <button class="btn-secondary text-lg py-3">
+                了解更多 <i class="fa fa-info-circle ml-2"></i>
+              </button>
+            </div>
+            <div class="flex items-center gap-2 text-sm text-gray-500 pt-2">
+              <i class="fa fa-users text-primary"></i>
+              <span>已有 10,000+ 学习者加入</span>
+            </div>
+          </div>
+          <div class="md:w-1/2 relative">
+            <div class="relative z-10 rounded-2xl overflow-hidden shadow-2xl transform transition-transform hover:scale-[1.02] duration-500">
+              <img src="https://picsum.photos/id/3/600/400" alt="英语学习" class="w-full h-auto">
+            </div>
+            <div class="absolute -bottom-6 -left-6 w-32 h-32 bg-secondary/20 rounded-full filter blur-2xl"></div>
+            <div class="absolute -top-6 -right-6 w-32 h-32 bg-primary/20 rounded-full filter blur-2xl"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 特点介绍 -->
+    <section class="py-16 bg-white">
+      <div class="container mx-auto px-4 md:px-6">
+        <div class="text-center max-w-3xl mx-auto mb-16">
+          <h2 class="text-[clamp(1.5rem,3vw,2.5rem)] font-bold mb-4">为什么选择 VocabMaster？</h2>
+          <p class="text-gray-600 text-lg">我们提供直观有效的单词学习工具，帮助你快速掌握新词汇</p>
+        </div>
+        
+        <div class="grid md:grid-cols-3 gap-8">
+          <!-- 特点 1 -->
+          <div class="bg-gray-50 rounded-xl p-6 card-hover">
+            <div class="w-14 h-14 bg-primary/10 rounded-lg flex items-center justify-center mb-5">
+              <i class="fa fa-list-alt text-primary text-2xl"></i>
+            </div>
+            <h3 class="text-xl font-semibold mb-3">自定义单词表</h3>
+            <p class="text-gray-600">根据你的学习需求创建专属单词表，添加定义、例句和发音，让学习更有针对性。</p>
+          </div>
+          
+          <!-- 特点 2 -->
+          <div class="bg-gray-50 rounded-xl p-6 card-hover">
+            <div class="w-14 h-14 bg-primary/10 rounded-lg flex items-center justify-center mb-5">
+              <i class="fa fa-pencil text-primary text-2xl"></i>
+            </div>
+            <h3 class="text-xl font-semibold mb-3">智能练习系统</h3>
+            <p class="text-gray-600">自动检查答案，实时反馈，并将错题自动加入错题集，方便针对性复习。</p>
+          </div>
+          
+          <!-- 特点 3 -->
+          <div class="bg-gray-50 rounded-xl p-6 card-hover">
+            <div class="w-14 h-14 bg-primary/10 rounded-lg flex items-center justify-center mb-5">
+              <i class="fa fa-line-chart text-primary text-2xl"></i>
+            </div>
+            <h3 class="text-xl font-semibold mb-3">进度追踪</h3>
+            <p class="text-gray-600">实时跟踪学习进度和掌握程度，通过数据可视化了解自己的学习状态和改进方向。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 单词表区域 -->
+    <section id="wordlists" class="py-16 bg-gray-50">
+      <div class="container mx-auto px-4 md:px-6">
+        <div class="flex flex-col md:flex-row md:items-end justify-between mb-10">
+          <div>
+            <h2 class="text-[clamp(1.5rem,3vw,2.5rem)] font-bold mb-3">我的单词表</h2>
+            <p class="text-gray-600 max-w-2xl">管理你的单词集合，创建新的单词表或编辑现有单词表</p>
+          </div>
+          <button id="create-list-btn" class="btn-primary mt-4 md:mt-0">
+            <i class="fa fa-plus mr-2"></i>创建新单词表
+          </button>
+        </div>
+        
+        <!-- 单词表列表 -->
+        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <!-- 单词表 1 -->
+          <div class="bg-white rounded-xl shadow-sm overflow-hidden card-hover">
+            <div class="p-6">
+              <div class="flex justify-between items-start mb-4">
+                <h3 class="text-xl font-semibold">商务英语词汇</h3>
+                <div class="flex space-x-2">
+                  <button class="text-gray-400 hover:text-primary transition-colors" title="编辑">
+                    <i class="fa fa-edit"></i>
+                  </button>
+                  <button class="text-gray-400 hover:text-danger transition-colors" title="删除">
+                    <i class="fa fa-trash"></i>
+                  </button>
+                </div>
+              </div>
+              <p class="text-gray-600 text-sm mb-4">适用于商务会议和谈判的常用词汇</p>
+              <div class="flex justify-between items-center">
+                <span class="text-sm text-gray-500"><i class="fa fa-book mr-1"></i> 42 个单词</span>
+                <button class="text-primary hover:text-primary/80 font-medium transition-colors">
+                  查看单词 <i class="fa fa-arrow-right ml-1"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+          
+          <!-- 单词表 2 -->
+          <div class="bg-white rounded-xl shadow-sm overflow-hidden card-hover">
+            <div class="p-6">
+              <div class="flex justify-between items-start mb-4">
+                <h3 class="text-xl font-semibold">旅行英语</h3>
+                <div class="flex space-x-2">
+                  <button class="text-gray-400 hover:text-primary transition-colors" title="编辑">
+                    <i class="fa fa-edit"></i>
+                  </button>
+                  <button class="text-gray-400 hover:text-danger transition-colors" title="删除">
+                    <i class="fa fa-trash"></i>
+                  </button>
+                </div>
+              </div>
+              <p class="text-gray-600 text-sm mb-4">出国旅行必备的实用英语表达</p>
+              <div class="flex justify-between items-center">
+                <span class="text-sm text-gray-500"><i class="fa fa-book mr-1"></i> 36 个单词</span>
+                <button class="text-primary hover:text-primary/80 font-medium transition-colors">
+                  查看单词 <i class="fa fa-arrow-right ml-1"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+          
+          <!-- 单词表 3 -->
+          <div class="bg-white rounded-xl shadow-sm overflow-hidden card-hover">
+            <div class="p-6">
+              <div class="flex justify-between items-start mb-4">
+                <h3 class="text-xl font-semibold">日常对话</h3>
+                <div class="flex space-x-2">
+                  <button class="text-gray-400 hover:text-primary transition-colors" title="编辑">
+                    <i class="fa fa-edit"></i>
+                  </button>
+                  <button class="text-gray-400 hover:text-danger transition-colors" title="删除">
+                    <i class="fa fa-trash"></i>
+                  </button>
+                </div>
+              </div>
+              <p class="text-gray-600 text-sm mb-4">日常生活中最常用的英语表达方式</p>
+              <div class="flex justify-between items-center">
+                <span class="text-sm text-gray-500"><i class="fa fa-book mr-1"></i> 58 个单词</span>
+                <button class="text-primary hover:text-primary/80 font-medium transition-colors">
+                  查看单词 <i class="fa fa-arrow-right ml-1"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 错题集区域 -->
+    <section id="mistakes" class="py-16 bg-white">
+      <div class="container mx-auto px-4 md:px-6">
+        <div class="flex flex-col md:flex-row md:items-end justify-between mb-10">
+          <div>
+            <h2 class="text-[clamp(1.5rem,3vw,2.5rem)] font-bold mb-3">我的错题集</h2>
+            <p class="text-gray-600 max-w-2xl">系统自动收集你答错的单词，针对性练习帮助你攻克薄弱点</p>
+          </div>
+          <div class="flex gap-3 mt-4 md:mt-0">
+            <button id="practice-mistakes-btn" class="btn-primary">
+              <i class="fa fa-play mr-2"></i>练习错题
+            </button>
+            <button id="clear-mistakes-btn" class="btn-secondary">
+              <i class="fa fa-trash mr-2"></i>清空错题
+            </button>
+          </div>
+        </div>
+        
+        <!-- 错题列表 -->
+        <div class="bg-gray-50 rounded-2xl p-6 md:p-8 shadow-sm">
+          <div class="overflow-x-auto">
+            <table class="w-full min-w-[640px]" id="mistakes-table">
+              <thead>
+                <tr class="border-b border-gray-200">
+                  <th class="text-left py-4 px-4 font-semibold">单词</th>
+                  <th class="text-left py-4 px-4 font-semibold">词性</th>
+                  <th class="text-left py-4 px-4 font-semibold">定义</th>
+                  <th class="text-left py-4 px-4 font-semibold">错误次数</th>
+                  <th class="text-left py-4 px-4 font-semibold">最近错误答案</th>
+                  <th class="text-left py-4 px-4 font-semibold">操作</th>
+                </tr>
+              </thead>
+              <tbody id="mistakes-list">
+                <!-- 错题列表将通过JavaScript动态生成 -->
+                <tr>
+                  <td colspan="6" class="py-8 text-center text-gray-500">
+                    <i class="fa fa-info-circle text-2xl mb-2 block"></i>
+                    你的错题集还是空的，开始练习吧！
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 单词表详情示例 -->
+    <section class="py-16 bg-white">
+      <div class="container mx-auto px-4 md:px-6">
+        <div class="bg-gray-50 rounded-2xl p-6 md:p-8 shadow-sm">
+          <div class="flex flex-col md:flex-row md:items-center justify-between mb-8">
+            <div>
+              <h2 class="text-2xl md:text-3xl font-bold mb-2">商务英语词汇</h2>
+              <p class="text-gray-600">42 个单词 · 最后学习: 昨天</p>
+            </div>
+            <div class="flex flex-wrap gap-3 mt-4 md:mt-0">
+              <button class="btn-secondary">
+                <i class="fa fa-plus mr-2"></i>添加单词
+              </button>
+              <button class="btn-primary" id="start-practice-btn">
+                <i class="fa fa-play mr-2"></i>开始练习
+              </button>
+            </div>
+          </div>
+          
+          <!-- 单词列表 -->
+          <div class="overflow-x-auto">
+            <table class="w-full min-w-[640px]">
+              <thead>
+                <tr class="border-b border-gray-200">
+                  <th class="text-left py-4 px-4 font-semibold">单词</th>
+                  <th class="text-left py-4 px-4 font-semibold">词性</th>
+                  <th class="text-left py-4 px-4 font-semibold">定义</th>
+                  <th class="text-left py-4 px-4 font-semibold">掌握程度</th>
+                  <th class="text-left py-4 px-4 font-semibold">操作</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="border-b border-gray-100 hover:bg-white/50 transition-colors">
+                  <td class="py-4 px-4 font-medium">negotiation</td>
+                  <td class="py-4 px-4 text-gray-600">n.</td>
+                  <td class="py-4 px-4 text-gray-600">讨论以达成协议的过程</td>
+                  <td class="py-4 px-4">
+                    <div class="w-32 bg-gray-200 rounded-full h-2.5">
+                      <div class="bg-secondary h-2.5 rounded-full" style="width: 80%"></div>
+                    </div>
+                  </td>
+                  <td class="py-4 px-4">
+                    <div class="flex space-x-2">
+                      <button class="text-gray-400 hover:text-primary transition-colors" title="编辑">
+                        <i class="fa fa-edit"></i>
+                      </button>
+                      <button class="text-gray-400 hover:text-danger transition-colors" title="删除">
+                        <i class="fa fa-trash"></i>
+                      </button>
+                      <button class="text-gray-400 hover:text-primary transition-colors" title="发音">
+                        <i class="fa fa-volume-up"></i>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+                <tr class="border-b border-gray-100 hover:bg-white/50 transition-colors">
+                  <td class="py-4 px-4 font-medium">proposal</td>
+                  <td class="py-4 px-4 text-gray-600">n.</td>
+                  <td class="py-4 px-4 text-gray-600">提出的计划或建议</td>
+                  <td class="py-4 px-4">
+                    <div class="w-32 bg-gray-200 rounded-full h-2.5">
+                      <div class="bg-secondary h-2.5 rounded-full" style="width: 60%"></div>
+                    </div>
+                  </td>
+                  <td class="py-4 px-4">
+                    <div class="flex space-x-2">
+                      <button class="text-gray-400 hover:text-primary transition-colors" title="编辑">
+                        <i class="fa fa-edit"></i>
+                      </button>
+                      <button class="text-gray-400 hover:text-danger transition-colors" title="删除">
+                        <i class="fa fa-trash"></i>
+                      </button>
+                      <button class="text-gray-400 hover:text-primary transition-colors" title="发音">
+                        <i class="fa fa-volume-up"></i>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+                <tr class="border-b border-gray-100 hover:bg-white/50 transition-colors">
+                  <td class="py-4 px-4 font-medium">collaboration</td>
+                  <td class="py-4 px-4 text-gray-600">n.</td>
+                  <td class="py-4 px-4 text-gray-600">合作，协作</td>
+                  <td class="py-4 px-4">
+                    <div class="w-32 bg-gray-200 rounded-full h-2.5">
+                      <div class="bg-secondary h-2.5 rounded-full" style="width: 30%"></div>
+                    </div>
+                  </td>
+                  <td class="py-4 px-4">
+                    <div class="flex space-x-2">
+                      <button class="text-gray-400 hover:text-primary transition-colors" title="编辑">
+                        <i class="fa fa-edit"></i>
+                      </button>
+                      <button class="text-gray-400 hover:text-danger transition-colors" title="删除">
+                        <i class="fa fa-trash"></i>
+                      </button>
+                      <button class="text-gray-400 hover:text-primary transition-colors" title="发音">
+                        <i class="fa fa-volume-up"></i>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          
+          <!-- 分页 -->
+          <div class="flex justify-between items-center mt-8">
+            <p class="text-gray-600 text-sm">显示 1-3 条，共 42 条</p>
+            <div class="flex space-x-1">
+              <button class="w-9 h-9 flex items-center justify-center rounded-lg border border-gray-300 text-gray-500 hover:border-primary hover:text-primary transition-colors">
+                <i class="fa fa-chevron-left text-sm"></i>
+              </button>
+              <button class="w-9 h-9 flex items-center justify-center rounded-lg bg-primary text-white">1</button>
+              <button class="w-9 h-9 flex items-center justify-center rounded-lg border border-gray-300 hover:border-primary hover:text-primary transition-colors">2</button>
+              <button class="w-9 h-9 flex items-center justify-center rounded-lg border border-gray-300 hover:border-primary hover:text-primary transition-colors">3</button>
+              <button class="w-9 h-9 flex items-center justify-center rounded-lg border border-gray-300 text-gray-500 hover:border-primary hover:text-primary transition-colors">
+                <i class="fa fa-chevron-right text-sm"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 练习区域 -->
+    <section id="practice" class="py-16 bg-gradient-to-br from-primary/5 to-primary/10">
+      <div class="container mx-auto px-4 md:px-6">
+        <div class="text-center max-w-3xl mx-auto mb-16">
+          <h2 class="text-[clamp(1.5rem,3vw,2.5rem)] font-bold mb-4">多样化练习模式</h2>
+          <p class="text-gray-600 text-lg">通过不同方式练习单词，巩固记忆，提高学习效率</p>
+        </div>
+        
+        <div class="grid md:grid-cols-3 gap-8">
+          <!-- 练习模式 1 -->
+          <div class="bg-white rounded-xl shadow-sm overflow-hidden card-hover">
+            <div class="h-48 overflow-hidden">
+              <img src="https://picsum.photos/id/20/600/400" alt="拼写练习" class="w-full h-full object-cover transition-transform duration-500 hover:scale-110">
+            </div>
+            <div class="p-6">
+              <h3 class="text-xl font-semibold mb-3">拼写练习</h3>
+              <p class="text-gray-600 text-sm mb-4">根据发音和定义，练习单词的正确拼写方式，系统自动检查并收集错题</p>
+              <button class="w-full btn-primary practice-mode-btn" data-mode="spelling">
+                开始练习 <i class="fa fa-play ml-2"></i>
+              </button>
+            </div>
+          </div>
+          
+          <!-- 练习模式 2 -->
+          <div class="bg-white rounded-xl shadow-sm overflow-hidden card-hover">
+            <div class="h-48 overflow-hidden">
+              <img src="https://picsum.photos/id/42/600/400" alt="选择练习" class="w-full h-full object-cover transition-transform duration-500 hover:scale-110">
+            </div>
+            <div class="p-6">
+              <h3 class="text-xl font-semibold mb-3">选择练习</h3>
+              <p class="text-gray-600 text-sm mb-4">从选项中选择正确的单词含义或拼写，即时反馈结果并收集错题</p>
+              <button class="w-full btn-primary practice-mode-btn" data-mode="selection">
+                开始练习 <i class="fa fa-play ml-2"></i>
+              </button>
+            </div>
+          </div>
+          
+          <!-- 练习模式 3 -->
+          <div class="bg-white rounded-xl shadow-sm overflow-hidden card-hover">
+            <div class="h-48 overflow-hidden">
+              <img src="https://picsum.photos/id/24/600/400" alt="配对练习" class="w-full h-full object-cover transition-transform duration-500 hover:scale-110">
+            </div>
+            <div class="p-6">
+              <h3 class="text-xl font-semibold mb-3">配对练习</h3>
+              <p class="text-gray-600 text-sm mb-4">将单词与对应的定义或翻译进行配对，自动判断对错并收集错题</p>
+              <button class="w-full btn-primary practice-mode-btn" data-mode="matching">
+                开始练习 <i class="fa fa-play ml-2"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 练习示例 -->
+        <div class="mt-16 bg-white rounded-2xl shadow-sm p-6 md:p-8">
+          <h3 class="text-2xl font-bold mb-6">练习示例：拼写练习</h3>
+          
+          <div class="max-w-2xl mx-auto">
+            <div class="bg-gray-50 rounded-xl p-6 md:p-8 mb-6" id="practice-container">
+              <div class="flex justify-between items-center mb-4">
+                <span class="text-sm font-medium text-gray-500" id="word-counter">单词 2/10</span>
+                <button class="text-primary hover:text-primary/80 transition-colors" id="pronounce-btn">
+                  <i class="fa fa-volume-up text-xl"></i>
+                </button>
+              </div>
+              
+              <div class="mb-6">
+                <p class="text-lg font-medium mb-2">请拼写以下单词：</p>
+                <p class="text-gray-700 italic" id="word-definition">"A formal meeting for discussion, especially in a business context."</p>
+              </div>
+              
+              <div class="mb-4">
+                <input type="text" id="answer-input" class="input-field text-lg" placeholder="在此输入单词...">
+                <div id="feedback-message" class="mt-2 text-sm hidden"></div>
+              </div>
+              
+              <div class="flex justify-between">
+                <button class="btn-secondary" id="skip-btn">
+                  跳过 <i class="fa fa-forward ml-2"></i>
+                </button>
+                <button class="btn-primary" id="submit-btn">
+                  提交 <i class="fa fa-check ml-2"></i>
+                </button>
+              </div>
+            </div>
+            
+            <div class="flex justify-between text-center text-gray-600">
+              <div>
+                <div class="w-10 h-10 bg-secondary/20 rounded-full flex items-center justify-center mx-auto mb-2">
+                  <i class="fa fa-check text-secondary"></i>
+                </div>
+                <p class="text-sm"><span id="correct-count">1</span> 正确</p>
+              </div>
+              <div>
+                <div class="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-2">
+                  <i class="fa fa-clock-o text-gray-500"></i>
+                </div>
+                <p class="text-sm"><span id="remaining-count">8</span> 剩余</p>
+              </div>
+              <div>
+                <div class="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-2">
+                  <i class="fa fa-times text-gray-500"></i>
+                </div>
+                <p class="text-sm"><span id="incorrect-count">0</span> 错误</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 进度追踪 -->
+    <section id="progress" class="py-16 bg-white">
+      <div class="container mx-auto px-4 md:px-6">
+        <div class="text-center max-w-3xl mx-auto mb-16">
+          <h2 class="text-[clamp(1.5rem,3vw,2.5rem)] font-bold mb-4">追踪你的学习进度</h2>
+          <p class="text-gray-600 text-lg">了解你的学习情况，见证自己的成长与进步</p>
+        </div>
+        
+        <div class="grid md:grid-cols-2 gap-8">
+          <!-- 学习统计图表 -->
+          <div class="bg-gray-50 rounded-xl p-6 shadow-sm">
+            <h3 class="text-xl font-semibold mb-6">每周学习单词数</h3>
+            <div class="h-80">
+              <canvas id="learningChart"></canvas>
+            </div>
+          </div>
+          
+          <!-- 掌握情况 -->
+          <div class="bg-gray-50 rounded-xl p-6 shadow-sm">
+            <h3 class="text-xl font-semibold mb-6">单词掌握情况</h3>
+            <div class="h-80">
+              <canvas id="masteryChart"></canvas>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 学习成就 -->
+        <div class="mt-12">
+          <h3 class="text-xl font-semibold mb-6">学习成就</h3>
+          <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div class="bg-gray-50 rounded-xl p-6 text-center card-hover">
+              <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fa fa-book text-primary text-2xl"></i>
+              </div>
+              <h4 class="font-semibold mb-1">总学习单词</h4>
+              <p class="text-3xl font-bold text-primary">136</p>
+            </div>
+            
+            <div class="bg-gray-50 rounded-xl p-6 text-center card-hover">
+              <div class="w-16 h-16 bg-secondary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fa fa-check-circle text-secondary text-2xl"></i>
+              </div>
+              <h4 class="font-semibold mb-1">已掌握</h4>
+              <p class="text-3xl font-bold text-secondary">78</p>
+            </div>
+            
+            <div class="bg-gray-50 rounded-xl p-6 text-center card-hover">
+              <div class="w-16 h-16 bg-warning/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fa fa-exclamation-circle text-warning text-2xl"></i>
+              </div>
+              <h4 class="font-semibold mb-1">错题数量</h4>
+              <p class="text-3xl font-bold text-warning" id="mistakes-count">12</p>
+            </div>
+            
+            <div class="bg-gray-50 rounded-xl p-6 text-center card-hover">
+              <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fa fa-trophy text-primary text-2xl"></i>
+              </div>
+              <h4 class="font-semibold mb-1">连续学习</h4>
+              <p class="text-3xl font-bold text-primary">7天</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 号召行动 -->
+    <section class="py-16 bg-primary text-white">
+      <div class="container mx-auto px-4 md:px-6 text-center">
+        <h2 class="text-[clamp(1.5rem,3vw,2.5rem)] font-bold mb-6">开始你的英语单词学习之旅</h2>
+        <p class="text-white/80 text-lg max-w-2xl mx-auto mb-8">创建你的第一个单词表，开启高效的英语词汇学习，提升你的语言能力</p>
+        <button class="bg-white text-primary px-8 py-3 rounded-lg font-medium text-lg transition-all duration-300 hover:bg-gray-100 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-white/50">
+          立即免费注册 <i class="fa fa-arrow-right ml-2"></i>
+        </button>
+      </div>
+    </section>
+  </main>
+
+  <!-- 页脚 -->
+  <footer class="bg-dark text-white/70 py-12">
+    <div class="container mx-auto px-4 md:px-6">
+      <div class="grid md:grid-cols-4 gap-8 mb-8">
+        <div>
+          <div class="flex items-center space-x-2 mb-4">
+            <div class="w-10 h-10 rounded-lg bg-primary flex items-center justify-center">
+              <i class="fa fa-book text-white text-xl"></i>
+            </div>
+            <span class="text-xl font-bold text-white">VocabMaster</span>
+          </div>
+          <p class="mb-4">高效的英语单词学习平台，帮助你轻松掌握新词汇，提升英语能力。</p>
+          <div class="flex space-x-4">
+            <a href="#" class="text-white/70 hover:text-white transition-colors">
+              <i class="fa fa-facebook"></i>
+            </a>
+            <a href="#" class="text-white/70 hover:text-white transition-colors">
+              <i class="fa fa-twitter"></i>
+            </a>
+            <a href="#" class="text-white/70 hover:text-white transition-colors">
+              <i class="fa fa-instagram"></i>
+            </a>
+            <a href="#" class="text-white/70 hover:text-white transition-colors">
+              <i class="fa fa-youtube"></i>
+            </a>
+          </div>
+        </div>
+        
+        <div>
+          <h4 class="text-white font-semibold mb-4">功能</h4>
+          <ul class="space-y-2">
+            <li><a href="#" class="hover:text-white transition-colors">单词表</a></li>
+            <li><a href="#" class="hover:text-white transition-colors">错题集</a></li>
+            <li><a href="#" class="hover:text-white transition-colors">练习模式</a></li>
+            <li><a href="#" class="hover:text-white transition-colors">进度追踪</a></li>
+          </ul>
+        </div>
+        
+        <div>
+          <h4 class="text-white font-semibold mb-4">支持</h4>
+          <ul class="space-y-2">
+            <li><a href="#" class="hover:text-white transition-colors">帮助中心</a></li>
+            <li><a href="#" class="hover:text-white transition-colors">联系我们</a></li>
+            <li><a href="#" class="hover:text-white transition-colors">常见问题</a></li>
+            <li><a href="#" class="hover:text-white transition-colors">使用教程</a></li>
+          </ul>
+        </div>
+        
+        <div>
+          <h4 class="text-white font-semibold mb-4">订阅更新</h4>
+          <p class="mb-4">获取最新的学习技巧和功能更新</p>
+          <div class="flex">
+            <input type="email" placeholder="你的邮箱地址" class="input-field bg-gray-800 border-gray-700 text-white rounded-r-none focus:border-primary">
+            <button class="bg-primary text-white px-4 rounded-l-none hover:bg-primary/90 transition-colors">
+              <i class="fa fa-paper-plane"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <div class="border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center">
+        <p>&copy; 2023 VocabMaster. 保留所有权利。</p>
+        <div class="flex space-x-6 mt-4 md:mt-0">
+          <a href="#" class="hover:text-white transition-colors">隐私政策</a>
+          <a href="#" class="hover:text-white transition-colors">服务条款</a>
+          <a href="#" class="hover:text-white transition-colors">Cookie 政策</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- 创建单词表模态框 -->
+  <div id="create-list-modal" class="fixed inset-0 z-50 flex items-center justify-center hidden">
+    <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" id="modal-backdrop"></div>
+    <div class="relative bg-white rounded-2xl shadow-xl w-full max-w-md p-6 md:p-8 transform transition-all">
+      <button id="close-modal" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
+        <i class="fa fa-times text-xl"></i>
+      </button>
+      
+      <h3 class="text-2xl font-bold mb-6">创建新单词表</h3>
+      
+      <form>
+        <div class="mb-4">
+          <label for="list-name" class="block text-sm font-medium text-gray-700 mb-1">单词表名称</label>
+          <input type="text" id="list-name" class="input-field" placeholder="例如：托福核心词汇">
+        </div>
+        
+        <div class="mb-6">
+          <label for="list-description" class="block text-sm font-medium text-gray-700 mb-1">描述（可选）</label>
+          <textarea id="list-description" rows="3" class="input-field" placeholder="简要描述这个单词表的用途..."></textarea>
+        </div>
+        
+        <div class="flex justify-end space-x-3">
+          <button type="button" id="cancel-create" class="btn-secondary">取消</button>
+          <button type="submit" class="btn-primary">创建单词表</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 练习结果模态框 -->
+  <div id="practice-result-modal" class="fixed inset-0 z-50 flex items-center justify-center hidden">
+    <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" id="result-modal-backdrop"></div>
+    <div class="relative bg-white rounded-2xl shadow-xl w-full max-w-md p-6 md:p-8 transform transition-all">
+      <button id="close-result-modal" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
+        <i class="fa fa-times text-xl"></i>
+      </button>
+      
+      <div class="text-center">
+        <h3 class="text-2xl font-bold mb-2">练习完成！</h3>
+        <p class="text-gray-600 mb-6">你的练习结果如下</p>
+        
+        <div class="flex justify-center gap-8 mb-8">
+          <div>
+            <p class="text-4xl font-bold text-secondary" id="final-correct">7</p>
+            <p class="text-gray-600">正确</p>
+          </div>
+          <div>
+            <p class="text-4xl font-bold text-danger" id="final-incorrect">3</p>
+            <p class="text-gray-600">错误</p>
+          </div>
+        </div>
+        
+        <div class="mb-6">
+          <div class="w-full bg-gray-200 rounded-full h-4 mb-2">
+            <div id="result-progress" class="bg-secondary h-4 rounded-full" style="width: 70%"></div>
+          </div>
+          <p class="text-sm text-gray-600">正确率: <span id="accuracy-rate">70%</span></p>
+        </div>
+        
+        <div class="flex gap-3">
+          <button id="review-mistakes-btn" class="flex-1 btn-secondary">
+            查看错题 <i class="fa fa-list ml-2"></i>
+          </button>
+          <button id="restart-practice" class="flex-1 btn-primary">
+            再次练习 <i class="fa fa-refresh ml-2"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- JavaScript -->
+  <script>
+    // 练习单词数据库
+    const practiceWords = [
+      {
+        word: "meeting",
+        definition: "A formal meeting for discussion, especially in a business context.",
+        partOfSpeech: "n."
+      },
+      {
+        word: "negotiation",
+        definition: "The process of discussing something in order to reach an agreement.",
+        partOfSpeech: "n."
+      },
+      {
+        word: "proposal",
+        definition: "A plan or suggestion put forward for consideration or discussion by others.",
+        partOfSpeech: "n."
+      },
+      {
+        word: "collaboration",
+        definition: "The action of working with someone to produce or create something.",
+        partOfSpeech: "n."
+      },
+      {
+        word: "deadline",
+        definition: "A time or date by which something must be completed.",
+        partOfSpeech: "n."
+      },
+      {
+        word: "budget",
+        definition: "An estimate of income and expenditure for a set period of time.",
+        partOfSpeech: "n."
+      },
+      {
+        word: "strategy",
+        definition: "A plan of action designed to achieve a long-term or overall aim.",
+        partOfSpeech: "n."
+      },
+      {
+        word: "feedback",
+        definition: "Information about reactions to a product, a person's performance of a task, etc.",
+        partOfSpeech: "n."
+      },
+      {
+        word: "objective",
+        definition: "A goal that is aimed for.",
+        partOfSpeech: "n."
+      },
+      {
+        word: "priority",
+        definition: "The fact or condition of being regarded or treated as more important than others.",
+        partOfSpeech: "n."
+      }
+    ];
+
+    // 全局变量
+    let currentWordIndex = 1; // 从第二个单词开始，与示例保持一致
+    let correctCount = 1;
+    let incorrectCount = 0;
+    let remainingCount = 8;
+    let mistakesList = []; // 错题集数组
+    
+    // DOM 元素
+    const answerInput = document.getElementById('answer-input');
+    const submitBtn = document.getElementById('submit-btn');
+    const skipBtn = document.getElementById('skip-btn');
+    const feedbackMessage = document.getElementById('feedback-message');
+    const wordCounter = document.getElementById('word-counter');
+    const wordDefinition = document.getElementById('word-definition');
+    const correctCountEl = document.getElementById('correct-count');
+    const incorrectCountEl = document.getElementById('incorrect-count');
+    const remainingCountEl = document.getElementById('remaining-count');
+    const pronounceBtn = document.getElementById('pronounce-btn');
+    const startPracticeBtn = document.getElementById('start-practice-btn');
+    const practiceModeBtns = document.querySelectorAll('.practice-mode-btn');
+    const mistakesListEl = document.getElementById('mistakes-list');
+    const mistakesCountEl = document.getElementById('mistakes-count');
+    const practiceMistakesBtn = document.getElementById('practice-mistakes-btn');
+    const clearMistakesBtn = document.getElementById('clear-mistakes-btn');
+    const reviewMistakesBtn = document.getElementById('review-mistakes-btn');
+    
+    // 结果模态框元素
+    const practiceResultModal = document.getElementById('practice-result-modal');
+    const closeResultModal = document.getElementById('close-result-modal');
+    const resultModalBackdrop = document.getElementById('result-modal-backdrop');
+    const restartPracticeBtn = document.getElementById('restart-practice');
+    const finalCorrectEl = document.getElementById('final-correct');
+    const finalIncorrectEl = document.getElementById('final-incorrect');
+    const resultProgressEl = document.getElementById('result-progress');
+    const accuracyRateEl = document.getElementById('accuracy-rate');
+
+    // 初始化 - 从本地存储加载错题集
+    function init() {
+      const savedMistakes = localStorage.getItem('vocabMistakes');
+      if (savedMistakes) {
+        mistakesList = JSON.parse(savedMistakes);
+      }
+      updateMistakesList();
+      updateMistakesCount();
+    }
+
+    // 更新错题集显示
+    function updateMistakesList() {
+      if (mistakesList.length === 0) {
+        mistakesListEl.innerHTML = `
+          <tr>
+            <td colspan="6" class="py-8 text-center text-gray-500">
+              <i class="fa fa-info-circle text-2xl mb-2 block"></i>
+              你的错题集还是空的，开始练习吧！
+            </td>
+          </tr>
+        `;
+        return;
+      }
+      
+      let html = '';
+      mistakesList.forEach((mistake, index) => {
+        html += `
+          <tr class="border-b border-gray-100 hover:bg-white/50 transition-colors">
+            <td class="py-4 px-4 font-medium">${mistake.word}</td>
+            <td class="py-4 px-4 text-gray-600">${mistake.partOfSpeech}</td>
+            <td class="py-4 px-4 text-gray-600">${mistake.definition}</td>
+            <td class="py-4 px-4">
+              <span class="bg-danger/10 text-danger px-2 py-1 rounded-full text-sm">${mistake.errorCount} 次</span>
+            </td>
+            <td class="py-4 px-4 text-gray-600">${mistake.lastIncorrectAnswer}</td>
+            <td class="py-4 px-4">
+              <div class="flex space-x-2">
+                <button class="text-primary hover:text-primary/80 transition-colors" title="发音" onclick="pronounceSpecificWord('${mistake.word}')">
+                  <i class="fa fa-volume-up"></i>
+                </button>
+                <button class="text-gray-400 hover:text-danger transition-colors" title="删除" onclick="removeMistake(${index})">
+                  <i class="fa fa-trash"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        `;
+      });
+      
+      mistakesListEl.innerHTML = html;
+    }
+
+    // 更新错题数量显示
+    function updateMistakesCount() {
+      mistakesCountEl.textContent = mistakesList.length;
+    }
+
+    // 添加错题到错题集
+    function addToMistakes(wordData, userAnswer) {
+      // 检查该单词是否已在错题集中
+      const existingIndex = mistakesList.findIndex(item => item.word === wordData.word);
+      
+      if (existingIndex !== -1) {
+        // 如果已存在，更新错误次数和最近错误答案
+        mistakesList[existingIndex].errorCount++;
+        mistakesList[existingIndex].lastIncorrectAnswer = userAnswer;
+        mistakesList[existingIndex].lastErrorDate = new Date().toISOString();
+      } else {
+        // 如果不存在，添加新的错题记录
+        mistakesList.push({
+          word: wordData.word,
+          definition: wordData.definition,
+          partOfSpeech: wordData.partOfSpeech,
+          errorCount: 1,
+          lastIncorrectAnswer: userAnswer,
+          lastErrorDate: new Date().toISOString()
+        });
+      }
+      
+      // 保存到本地存储
+      localStorage.setItem('vocabMistakes', JSON.stringify(mistakesList));
+      
+      // 更新显示
+      updateMistakesList();
+      updateMistakesCount();
+    }
+
+    // 从错题集中移除错题
+    function removeMistake(index) {
+      mistakesList.splice(index, 1);
+      localStorage.setItem('vocabMistakes', JSON.stringify(mistakesList));
+      updateMistakesList();
+      updateMistakesCount();
+    }
+
+    // 清空错题集
+    function clearAllMistakes() {
+      if (confirm('确定要清空所有错题吗？此操作不可恢复。')) {
+        mistakesList = [];
+        localStorage.setItem('vocabMistakes', JSON.stringify(mistakesList));
+        updateMistakesList();
+        updateMistakesCount();
+      }
+    }
+
+    // 练习错题
+    function practiceMistakes() {
+      if (mistakesList.length === 0) {
+        alert('你的错题集是空的，没有可练习的错题。');
+        return;
+      }
+      
+      // 滚动到练习区域
+      document.getElementById('practice').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      
+      // 重置练习状态
+      currentWordIndex = 0;
+      correctCount = 0;
+      incorrectCount = 0;
+      
+      // 使用错题集作为练习单词
+      const practiceWordsBackup = [...practiceWords];
+      practiceWords.length = 0;
+      mistakesList.forEach(mistake => {
+        practiceWords.push({
+          word: mistake.word,
+          definition: mistake.definition,
+          partOfSpeech: mistake.partOfSpeech
+        });
+      });
+      
+      remainingCount = practiceWords.length - 1;
+      
+      // 更新计数显示
+      wordCounter.textContent = `单词 ${currentWordIndex + 1}/${practiceWords.length}`;
+      correctCountEl.textContent = correctCount;
+      incorrectCountEl.textContent = incorrectCount;
+      remainingCountEl.textContent = remainingCount;
+      
+      // 清除样式和输入
+      answerInput.value = '';
+      answerInput.classList.remove('input-correct', 'input-incorrect');
+      feedbackMessage.classList.add('hidden');
+      
+      // 重新启用提交按钮
+      submitBtn.disabled = false;
+      
+      // 更新当前单词定义
+      wordDefinition.textContent = `"${practiceWords[currentWordIndex].definition}"`;
+      
+      // 练习完成后恢复原单词列表
+      const originalNextWord = window.nextWord;
+      window.nextWord = function() {
+        currentWordIndex++;
+        remainingCount--;
+        
+        // 更新计数显示
+        wordCounter.textContent = `单词 ${currentWordIndex + 1}/${practiceWords.length}`;
+        remainingCountEl.textContent = remainingCount;
+        
+        // 清除样式和输入
+        answerInput.value = '';
+        answerInput.classList.remove('input-correct', 'input-incorrect');
+        feedbackMessage.classList.add('hidden');
+        
+        // 重新启用提交按钮
+        submitBtn.disabled = false;
+        
+        // 检查是否完成所有单词
+        if (currentWordIndex >= practiceWords.length) {
+          // 恢复原单词列表
+          practiceWords.length = 0;
+          practiceWords.push(...practiceWordsBackup);
+          window.nextWord = originalNextWord;
+          showPracticeResult();
+          return;
+        }
+        
+        // 更新当前单词定义
+        wordDefinition.textContent = `"${practiceWords[currentWordIndex].definition}"`;
+      };
+    }
+
+    // 导航栏滚动效果
+    window.addEventListener('scroll', function() {
+      const navbar = document.getElementById('navbar');
+      if (window.scrollY > 50) {
+        navbar.classList.add('shadow-md');
+        navbar.classList.remove('shadow-sm');
+      } else {
+        navbar.classList.remove('shadow-md');
+        navbar.classList.add('shadow-sm');
+      }
+    });
+    
+    // 移动端菜单切换
+    const menuToggle = document.getElementById('menu-toggle');
+    const mobileMenu = document.getElementById('mobile-menu');
+    
+    menuToggle.addEventListener('click', function() {
+      mobileMenu.classList.toggle('hidden');
+    });
+    
+    // 平滑滚动
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        
+        const targetId = this.getAttribute('href');
+        const targetElement = document.querySelector(targetId);
+        
+        if (targetElement) {
+          window.scrollTo({
+            top: targetElement.offsetTop - 80,
+            behavior: 'smooth'
+          });
+          
+          // 关闭移动菜单（如果打开）
+          if (!mobileMenu.classList.contains('hidden')) {
+            mobileMenu.classList.add('hidden');
+          }
+        }
+      });
+    });
+    
+    // 模态框控制
+    const createListBtn = document.getElementById('create-list-btn');
+    const createListModal = document.getElementById('create-list-modal');
+    const closeModal = document.getElementById('close-modal');
+    const cancelCreate = document.getElementById('cancel-create');
+    const modalBackdrop = document.getElementById('modal-backdrop');
+    
+    function openModal() {
+      createListModal.classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+    }
+    
+    function closeModalFunc() {
+      createListModal.classList.add('hidden');
+      document.body.style.overflow = '';
+    }
+    
+    createListBtn.addEventListener('click', openModal);
+    closeModal.addEventListener('click', closeModalFunc);
+    cancelCreate.addEventListener('click', closeModalFunc);
+    modalBackdrop.addEventListener('click', closeModalFunc);
+    
+    // 检查答案功能
+    function checkAnswer() {
+      const userAnswer = answerInput.value.trim().toLowerCase();
+      const correctAnswer = practiceWords[currentWordIndex].word.toLowerCase();
+      const currentWordData = practiceWords[currentWordIndex];
+      
+      // 清除之前的样式和反馈
+      answerInput.classList.remove('input-correct', 'input-incorrect');
+      feedbackMessage.classList.add('hidden');
+      
+      if (userAnswer === '') {
+        feedbackMessage.textContent = '请输入答案后再提交';
+        feedbackMessage.classList.remove('hidden', 'text-secondary');
+        feedbackMessage.classList.add('text-warning');
+        return;
+      }
+      
+      // 禁用提交按钮防止重复提交
+      submitBtn.disabled = true;
+      
+      if (userAnswer === correctAnswer) {
+        // 答案正确
+        answerInput.classList.add('input-correct');
+        feedbackMessage.textContent = `正确！单词 "${correctAnswer}" 的意思是：${currentWordData.definition}`;
+        feedbackMessage.classList.remove('hidden', 'text-danger', 'text-warning');
+        feedbackMessage.classList.add('text-secondary');
+        correctCount++;
+        correctCountEl.textContent = correctCount;
+      } else {
+        // 答案错误 - 添加到错题集
+        answerInput.classList.add('input-incorrect');
+        feedbackMessage.textContent = `错误。正确答案是：${correctAnswer}`;
+        feedbackMessage.classList.remove('hidden', 'text-secondary', 'text-warning');
+        feedbackMessage.classList.add('text-danger');
+        incorrectCount++;
+        incorrectCountEl.textContent = incorrectCount;
+        
+        // 添加到错题集
+        addToMistakes(currentWordData, userAnswer);
+      }
+      
+      // 2秒后进入下一个单词
+      setTimeout(nextWord, 2000);
+    }
+    
+    // 下一个单词
+    function nextWord() {
+      currentWordIndex++;
+      remainingCount--;
+      
+      // 更新计数显示
+      wordCounter.textContent = `单词 ${currentWordIndex + 1}/${practiceWords.length}`;
+      remainingCountEl.textContent = remainingCount;
+      
+      // 清除样式和输入
+      answerInput.value = '';
+      answerInput.classList.remove('input-correct', 'input-incorrect');
+      feedbackMessage.classList.add('hidden');
+      
+      // 重新启用提交按钮
+      submitBtn.disabled = false;
+      
+      // 检查是否完成所有单词
+      if (currentWordIndex >= practiceWords.length) {
+        showPracticeResult();
+        return;
+      }
+      
+      // 更新当前单词定义
+      wordDefinition.textContent = `"${practiceWords[currentWordIndex].definition}"`;
+    }
+    
+    // 显示练习结果
+    function showPracticeResult() {
+      const total = correctCount + incorrectCount;
+      const accuracy = Math.round((correctCount / total) * 100);
+      
+      finalCorrectEl.textContent = correctCount;
+      finalIncorrectEl.textContent = incorrectCount;
+      resultProgressEl.style.width = `${accuracy}%`;
+      accuracyRateEl.textContent = `${accuracy}%`;
+      
+      practiceResultModal.classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+    }
+    
+    // 重新开始练习
+    function restartPractice() {
+      currentWordIndex = 0;
+      correctCount = 0;
+      incorrectCount = 0;
+      remainingCount = practiceWords.length - 1;
+      
+      // 更新计数显示
+      wordCounter.textContent = `单词 ${currentWordIndex + 1}/${practiceWords.length}`;
+      correctCountEl.textContent = correctCount;
+      incorrectCountEl.textContent = incorrectCount;
+      remainingCountEl.textContent = remainingCount;
+      
+      // 清除样式和输入
+      answerInput.value = '';
+      answerInput.classList.remove('input-correct', 'input-incorrect');
+      feedbackMessage.classList.add('hidden');
+      
+      // 重新启用提交按钮
+      submitBtn.disabled = false;
+      
+      // 更新当前单词定义
+      wordDefinition.textContent = `"${practiceWords[currentWordIndex].definition}"`;
+      
+      // 关闭结果模态框
+      practiceResultModal.classList.add('hidden');
+      document.body.style.overflow = '';
+      
+      // 滚动到练习区域
+      document.getElementById('practice').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+    
+    // 单词发音功能
+    function pronounceWord() {
+      const word = practiceWords[currentWordIndex].word;
+      pronounceSpecificWord(word);
+    }
+    
+    // 特定单词发音
+    function pronounceSpecificWord(word) {
+      // 使用浏览器内置语音合成API
+      const utterance = new SpeechSynthesisUtterance(word);
+      utterance.lang = 'en-US';
+      window.speechSynthesis.speak(utterance);
+    }
+    
+    // 事件监听器
+    submitBtn.addEventListener('click', checkAnswer);
+    
+    skipBtn.addEventListener('click', function() {
+      const currentWordData = practiceWords[currentWordIndex];
+      // 跳过当前单词，计入错误并添加到错题集
+      incorrectCount++;
+      incorrectCountEl.textContent = incorrectCount;
+      addToMistakes(currentWordData, '跳过');
+      nextWord();
+    });
+    
+    pronounceBtn.addEventListener('click', pronounceWord);
+    
+    // 按回车键提交答案
+    answerInput.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        checkAnswer();
+      }
+    });
+    
+    // 开始练习按钮
+    startPracticeBtn.addEventListener('click', function() {
+      restartPractice();
+    });
+    
+    // 练习模式按钮
+    practiceModeBtns.forEach(btn => {
+      btn.addEventListener('click', function() {
+        const mode = this.getAttribute('data-mode');
+        if (mode === 'spelling') {
+          restartPractice();
+        } else {
+          alert(`"${this.closest('.bg-white').querySelector('h3').textContent}" 模式即将上线，敬请期待！`);
+        }
+      });
+    });
+    
+    // 结果模态框控制
+    closeResultModal.addEventListener('click', function() {
+      practiceResultModal.classList.add('hidden');
+      document.body.style.overflow = '';
+    });
+    
+    resultModalBackdrop.addEventListener('click', function() {
+      practiceResultModal.classList.add('hidden');
+      document.body.style.overflow = '';
+    });
+    
+    restartPracticeBtn.addEventListener('click', restartPractice);
+    
+    // 错题集相关按钮
+    practiceMistakesBtn.addEventListener('click', practiceMistakes);
+    clearMistakesBtn.addEventListener('click', clearAllMistakes);
+    reviewMistakesBtn.addEventListener('click', function() {
+      practiceResultModal.classList.add('hidden');
+      document.body.style.overflow = '';
+      document.getElementById('mistakes').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+    
+    // 学习进度图表
+    const learningCtx = document.getElementById('learningChart').getContext('2d');
+    const learningChart = new Chart(learningCtx, {
+      type: 'bar',
+      data: {
+        labels: ['周一', '周二', '周三', '周四', '周五', '周六', '周日'],
+        datasets: [{
+          label: '学习单词数',
+          data: [12, 8, 15, 5, 20, 18, 10],
+          backgroundColor: '#165DFF',
+          borderRadius: 6
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            grid: {
+              color: 'rgba(0, 0, 0, 0.05)'
+            }
+          },
+          x: {
+            grid: {
+              display: false
+            }
+          }
+        }
+      }
+    });
+    
+    // 掌握情况图表
+    const masteryCtx = document.getElementById('masteryChart').getContext('2d');
+    const masteryChart = new Chart(masteryCtx, {
+      type: 'doughnut',
+      data: {
+        labels: ['已掌握', '学习中', '未开始'],
+        datasets: [{
+          data: [78, 32, 26],
+          backgroundColor: ['#36D399', '#FF9F43', '#E2E8F0'],
+          borderWidth: 0,
+          borderRadius: 4
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        cutout: '70%',
+        plugins: {
+          legend: {
+            position: 'bottom'
+          }
+        }
+      }
+    });
+
+    // 页面加载时初始化
+    window.addEventListener('load', init);
+  </script>
+</body>
+</html>
